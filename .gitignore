@@ -45,3 +45,6 @@ app.*.map.json
 
 # Keys
 lib/utils/api_keys.dart
+
+# FVM
+.fvm/flutter_sdk/
