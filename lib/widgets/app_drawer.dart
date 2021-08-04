@@ -50,8 +50,10 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.exit_to_app),
             title: Text('Sair'),
-            onTap: () {
-              Provider.of<Auth>(context, listen: false).logout();
+            onTap: () async {
+              await Provider.of<Auth>(context, listen: false).logout();
+              await Navigator.of(context)
+                .pushReplacementNamed(AppRoutes.AUTH_HOME);
             }
           ),
         ],
