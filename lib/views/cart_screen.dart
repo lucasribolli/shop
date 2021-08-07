@@ -33,7 +33,7 @@ class CartScreen extends StatelessWidget {
                         style: TextStyle(
                             color: Theme.of(context)
                                 .primaryTextTheme
-                                .headline6
+                                .headline6!
                                 .color)),
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
@@ -47,8 +47,8 @@ class CartScreen extends StatelessWidget {
           const SizedBox(height: 10),
           Expanded(
               child: ListView.builder(
-            itemCount: cart.itemsCount,
-            itemBuilder: (_, i) => CartItemWidget(cartItems[i]),
+              itemCount: cart.itemsCount,
+              itemBuilder: (_, i) => CartItemWidget(cartItems[i]),
           ))
         ],
       ),
@@ -58,8 +58,8 @@ class CartScreen extends StatelessWidget {
 
 class OrderButton extends StatefulWidget {
   const OrderButton({
-    Key key,
-    @required this.cart,
+    Key? key,
+    required this.cart,
   }) : super(key: key);
 
   final Cart cart;
@@ -73,9 +73,11 @@ class _OrderButtonState extends State<OrderButton> {
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
+    return TextButton(
       child: _isLoading ? CircularProgressIndicator() : Text('COMPRAR'),
-      textColor: Theme.of(context).primaryColor,
+      style: TextButton.styleFrom(
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
       onPressed: widget.cart.totalAmout == 0
           ? null
           : () async {

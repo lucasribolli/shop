@@ -10,11 +10,11 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scaffold = Scaffold.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     return ListTile(
-      leading: CircleAvatar(backgroundImage: NetworkImage(product.imageUrl)),
-      title: Text(product.title),
+      leading: CircleAvatar(backgroundImage: NetworkImage(product.imageUrl!)),
+      title: Text(product.title!),
       trailing: Container(
           width: 100,
           child: Row(
@@ -39,11 +39,11 @@ class ProductItem extends StatelessWidget {
                       title: Text('Excluir produto'),
                       content: Text('Tem certeza?'),
                       actions: <Widget>[
-                        FlatButton(
+                        TextButton(
                             child: Text('Sim'),
                             // fechar dialog
                             onPressed: () => Navigator.of(context).pop(true)),
-                        FlatButton(
+                        TextButton(
                             child: Text('Não'),
                             onPressed: () => Navigator.of(context).pop(false)),
                       ],
@@ -54,11 +54,13 @@ class ProductItem extends StatelessWidget {
                         await Provider.of<Products>(context, listen: false)
                             .deleteProduct(product.id);
                       } catch (error) {
-                        scaffold.showSnackBar(SnackBar(
-                          content: Text(
-                            error.toString(),
+                        scaffoldMessenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              error.toString(),
+                            ),
                           ),
-                        ));
+                        );
                       }
                     }
                   });

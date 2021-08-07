@@ -8,8 +8,8 @@ import 'package:shop/providers/product.dart';
 
 class Products with ChangeNotifier {
   List<Product> _items;
-  String _token;
-  String _userId;
+  String? _token;
+  String? _userId;
 
   Products([this._token, this._userId, this._items = const []]);
 
@@ -21,10 +21,11 @@ class Products with ChangeNotifier {
   }
 
   Future<void> loadProducts() async {
-    final response = await http.get("${Constants.BASE_URL_PRODUCTS}.json?auth=$_token");
-    Map<String, dynamic> data = json.decode(response.body);
-    final favResponse = 
-      await http.get("${Constants.BASE_URL_USER_FAVORITES}/$_userId.json?auth=$_token");
+    final productsUrl = Uri.parse("${Constants.BASE_URL_PRODUCTS}.json?auth=$_token");
+    final favoritesUrl = Uri.parse("${Constants.BASE_URL_USER_FAVORITES}/$_userId.json?auth=$_token");
+    final response = await http.get(productsUrl);
+    Map<String, dynamic>? data = json.decode(response.body);
+    final favResponse = await http.get(favoritesUrl);
     final favMap = json.decode(favResponse.body);
 
     _items.clear();
@@ -46,8 +47,9 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProduct(Product newProduct) async {
+    final url = Uri.parse("${Constants.BASE_URL_PRODUCTS}.json?auth=$_token"); 
     final response = await http.post(
-      "${Constants.BASE_URL_PRODUCTS}.json?auth=$_token",
+      url,
       body: json.encode({
         'title': newProduct.title,
         'description': newProduct.description,
@@ -66,34 +68,33 @@ class Products with ChangeNotifier {
   }
 
   Future<void> updateProduct(Product product) async {
-    if (product != null && product.id != null) {
-      final index = _items.indexWhere((prod) => prod.id == product.id);
+    final index = _items.indexWhere((prod) => prod.id == product.id);
 
-      if (index >= 0) {
-        await http.patch(
-          "${Constants.BASE_URL_PRODUCTS}/${product.id}.json?auth=$_token",
-          body: json.encode({
-            'title': product.title,
-            'description': product.description,
-            'price': product.price,
-            'imageUrl': product.imageUrl,
-          })
-        );
-        _items[index] = product;
-        notifyListeners();
-      }
+    if (index >= 0) {
+      final url = Uri.parse("${Constants.BASE_URL_PRODUCTS}/${product.id}.json?auth=$_token");
+      await http.patch(
+        url,
+        body: json.encode({
+          'title': product.title,
+          'description': product.description,
+          'price': product.price,
+          'imageUrl': product.imageUrl,
+        })
+      );
+      _items[index] = product;
+      notifyListeners();
     }
   }
 
-  Future<void> deleteProduct(String id) async {
+  Future<void> deleteProduct(String? id) async {
     final index = _items.indexWhere((prod) => prod.id == id);
     if (index >= 0) {
       final product = _items[index];
 
       _items.removeWhere((prod) => prod.id == id);
       notifyListeners();
-
-      final response = await http.delete("${Constants.BASE_URL_PRODUCTS}/${product.id}.json?auth=$_token");
+      final url = Uri.parse("${Constants.BASE_URL_PRODUCTS}/${product.id}.json?auth=$_token");
+      final response = await http.delete(url);
 
       if (response.statusCode >= 400) {
         _items.insert(index, product);

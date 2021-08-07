@@ -17,7 +17,7 @@ class _AuthCardState extends State<AuthCard> {
   AuthMode _authMode = AuthMode.Login;
   final _passwordController = TextEditingController();
 
-  final Map<String, String> _authData = {
+  final Map<String, String?> _authData = {
     'email': '', 
     'password': ''
   };
@@ -29,7 +29,7 @@ class _AuthCardState extends State<AuthCard> {
         title: Text('Ocorreu um erro!'),
         content: Text(message),
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text('Fechar')
           )
@@ -39,7 +39,7 @@ class _AuthCardState extends State<AuthCard> {
   }
 
   Future<void> _submit() async {
-    if (!_form.currentState.validate()) {
+    if (!_form.currentState!.validate()) {
       return;
     }
 
@@ -47,7 +47,7 @@ class _AuthCardState extends State<AuthCard> {
       _isLoading = true;
     });
 
-    _form.currentState.save();
+    _form.currentState!.save();
 
     Auth auth = Provider.of(context, listen: false);
 
@@ -106,7 +106,7 @@ class _AuthCardState extends State<AuthCard> {
               TextFormField(
                 decoration: InputDecoration(labelText: 'E-mail'),
                 keyboardType: TextInputType.emailAddress,
-                validator: (email) => Validator.validateEmail(email),
+                validator: (email) => Validator.validateEmail(email!),
                 onSaved: (value) => _authData['email'] = value,
               ),
               TextFormField(
@@ -114,7 +114,7 @@ class _AuthCardState extends State<AuthCard> {
                 controller: _passwordController,
                 obscureText: true,
                 keyboardType: TextInputType.text,
-                validator: (password) => Validator.validatePassword(password),
+                validator: (password) => Validator.validatePassword(password!),
                 onSaved: (value) => _authData['password'] = value,
                 maxLength: 20,
               ),
@@ -137,27 +137,34 @@ class _AuthCardState extends State<AuthCard> {
               if (_isLoading)
                 CircularProgressIndicator()
               else
-                RaisedButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  color: Theme.of(context).primaryColor,
-                  textColor: Theme.of(context).primaryTextTheme.button.color,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 30.0,
-                    vertical: 8.0,
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Theme.of(context).primaryColor,
+                    minimumSize: Size(88, 36),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 30.0,
+                      vertical: 8.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    textStyle: TextStyle(
+                      color: Theme.of(context).primaryTextTheme.button!.color
+                    ),
                   ),
                   child: Text(
                     _authMode == AuthMode.Login ? 'Entrar' : 'Registrar',
                   ),
                   onPressed: _submit,
                 ),
-              FlatButton(
+              TextButton(
                 onPressed: _switchAuthMode,
                 child: Text(
                   "Alterar para ${_authMode == AuthMode.Login ? 'Registrar' : 'Login'}",
                 ),
-                textColor: Theme.of(context).primaryColor,
+                style: TextButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                ),
               )
             ],
           ),

@@ -24,7 +24,7 @@ class ProductItem extends StatelessWidget {
             );
           },
           child: Image.network(
-            product.imageUrl,
+            product.imageUrl!,
             fit: BoxFit.cover,
           ),
         ),
@@ -40,13 +40,13 @@ class ProductItem extends StatelessWidget {
                 },
                 color: Theme.of(context).accentColor),
           ),
-          title: Text(product.title, textAlign: TextAlign.center),
+          title: Text(product.title!, textAlign: TextAlign.center),
           trailing: IconButton(
             icon: Icon(Icons.shopping_cart),
             color: Theme.of(context).accentColor,
             onPressed: () {
-              Scaffold.of(context).hideCurrentSnackBar();
-              Scaffold.of(context).showSnackBar(
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Item adicionado com sucesso!'),
                   duration: Duration(seconds: 2),

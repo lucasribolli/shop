@@ -21,9 +21,9 @@ class _OrderWidgetState extends State<OrderWidget> {
       child: Column(
         children: <Widget>[
           ListTile(
-            title: Text('R\$${widget.order.total.toStringAsFixed(2)}'),
+            title: Text('R\$${widget.order.total!.toStringAsFixed(2)}'),
             subtitle: Text(
-              DateFormat('dd/MM/yyyy hh:mm').format(widget.order.date),
+              DateFormat('dd/MM/yyyy hh:mm').format(widget.order.date!),
             ),
             trailing: IconButton(
               icon: Icon(Icons.expand_more),
@@ -40,14 +40,14 @@ class _OrderWidgetState extends State<OrderWidget> {
                 horizontal: 15,
                 vertical: 4,
               ),
-              height: (widget.order.products.length * 25.0) + 10,
+              height: (widget.order.products!.length * 25.0) + 10,
               child: ListView(
-                children: widget.order.products.map((product) {
+                children: widget.order.products!.map((product) {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text(
-                        product.title,
+                        product.title!,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

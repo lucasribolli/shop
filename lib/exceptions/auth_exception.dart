@@ -8,14 +8,14 @@ class AuthException implements Exception {
     "TOO_MANY_ATTEMPTS_TRY_LATER": "Tente mais tarde!",
   };
 
-  final String key;
+  final String? key;
 
   const AuthException(this.key);
 
   @override
   String toString() {
     if(errors.containsKey(key)) {
-      return errors[key];
+      return errors[key!]!;
     } else {
       return 'Ocorreu um erro na autenticação';
     }

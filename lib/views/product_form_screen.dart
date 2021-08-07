@@ -16,7 +16,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   final _imageUrlFocusNode = FocusNode();
   final _imageUrlController = TextEditingController();
   final _form = GlobalKey<FormState>();
-  final _formData = Map<String, Object>();
+  final _formData = Map<String, Object?>();
   bool _isLoading = false;
 
   @override
@@ -30,7 +30,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     super.didChangeDependencies();
 
     if (_formData.isEmpty) {
-      final product = ModalRoute.of(context).settings.arguments as Product;
+      final product = ModalRoute.of(context)!.settings.arguments as Product?;
 
       if (product != null) {
         _formData['id'] = product.id;
@@ -39,7 +39,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         _formData['price'] = product.price;
         _formData['imageUrl'] = product.imageUrl;
 
-        _imageUrlController.text = _formData['imageUrl'];
+        _imageUrlController.text = _formData['imageUrl'] as String;
       } else {
         _formData['price'] = '';
       }
@@ -71,17 +71,17 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   }
 
   Future<void> _saveForm() async {
-    bool isValid = _form.currentState.validate();
+    bool isValid = _form.currentState!.validate();
 
     if (isValid) {
-      _form.currentState.save();
+      _form.currentState!.save();
 
       final product = Product(
-        id: _formData['id'],
-        title: _formData['title'],
-        price: _formData['price'],
-        description: _formData['description'],
-        imageUrl: _formData['imageUrl'],
+        id: _formData['id'] as String?,
+        title: _formData['title'] as String?,
+        price: _formData['price'] as double?,
+        description: _formData['description'] as String?,
+        imageUrl: _formData['imageUrl'] as String?,
       );
 
       setState(() {
@@ -104,7 +104,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               title: Text('Ocorreu um erro!'),
               content: Text('Erro ao salvar produto'),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   child: Text('OK'),
                   onPressed: () => Navigator.of(context).pop(),
                 )
@@ -139,7 +139,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 child: ListView(
                   children: <Widget>[
                     TextFormField(
-                      initialValue: _formData['title'],
+                      initialValue: _formData['title'] as String?,
                       decoration: InputDecoration(
                         labelText: 'Título',
                       ),
@@ -149,7 +149,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       },
                       onSaved: (value) => _formData['title'] = value,
                       validator: (value) {
-                        if (value.trim().isEmpty) {
+                        if (value!.trim().isEmpty) {
                           return 'Informe um título válido';
                         }
 
@@ -168,11 +168,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                               .requestFocus(_descriptionFocusNode);
                         },
                         onSaved: (value) =>
-                            _formData['price'] = double.tryParse(value) ?? 0.0,
+                            _formData['price'] = double.tryParse(value!) ?? 0.0,
                         validator: (value) {
-                          bool isEmpty = value.trim().isEmpty;
+                          bool isEmpty = value!.trim().isEmpty;
                           var newPrice = double.tryParse(value) ?? 0.0;
-                          bool isInvalid = newPrice == null || newPrice <= 0;
+                          bool isInvalid = newPrice <= 0;
 
                           if (isEmpty || isInvalid) {
                             return 'Informe um preço válido!';
@@ -181,14 +181,14 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                           return null;
                         }),
                     TextFormField(
-                        initialValue: _formData['description'],
+                        initialValue: _formData['description'] as String?,
                         decoration: InputDecoration(labelText: 'Descrição'),
                         maxLines: 3,
                         focusNode: _descriptionFocusNode,
                         keyboardType: TextInputType.multiline,
                         onSaved: (value) => _formData['description'] = value,
                         validator: (value) {
-                          bool isEmpty = value.trim().isEmpty;
+                          bool isEmpty = value!.trim().isEmpty;
                           bool isInvalid = value.trim().length < 5;
 
                           if (isEmpty || isInvalid) {
@@ -213,7 +213,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                             },
                             onSaved: (value) => _formData['imageUrl'] = value,
                             validator: (value) {
-                              bool emptyUrl = value.trim().isEmpty;
+                              bool emptyUrl = value!.trim().isEmpty;
                               bool invalidUrl = !isValidImageUrl(value);
                               if (emptyUrl || invalidUrl) {
                                 return 'Informe uma URL válida!';
