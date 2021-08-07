@@ -6,10 +6,10 @@ import 'package:shop/providers/cart.dart';
 
 class Order {
 
-  final String id;
-  final double total;
-  final List<CartItem> products;
-  final DateTime date;
+  final String? id;
+  final double? total;
+  final List<CartItem>? products;
+  final DateTime? date;
 
   Order({
     this.id,
@@ -21,8 +21,8 @@ class Order {
 
 class Orders with ChangeNotifier {
   List<Order> _items = [];
-  String _token;
-  String _userId;
+  String? _token;
+  String? _userId;
 
   Orders([this._token, this._userId, this._items = const []]);
 
@@ -35,9 +35,9 @@ class Orders with ChangeNotifier {
   Future<void> addOrder(Cart cart) async {
 
     final date = DateTime.now();
-
+    final url = Uri.parse("${Constants.BASE_URL_ORDERS}/$_userId.json?auth=$_token");
     final response = await http.post(
-      "${Constants.BASE_URL_ORDERS}/$_userId.json?auth=$_token",
+      url,
       body: json.encode({
         'total': cart.totalAmout,
         'date': date.toIso8601String(),
@@ -61,7 +61,7 @@ class Orders with ChangeNotifier {
     notifyListeners();
   }
 
-  List<CartItem> _getProductsFromOrder(List<dynamic> order) {
+  List<CartItem> _getProductsFromOrder(List<dynamic>? order) {
     if(order == null) {
       return <CartItem>[];
     }
@@ -78,10 +78,10 @@ class Orders with ChangeNotifier {
 
   Future<void> loadOrders() async {
     List<Order> loadedItems = [];
-    final response = 
-      await http.get("${Constants.BASE_URL_ORDERS}/$_userId.json?auth=$_token");
+    final url = Uri.parse("${Constants.BASE_URL_ORDERS}/$_userId.json?auth=$_token");
+    final response = await http.get(url);
 
-    Map<String, dynamic> data = json.decode(response.body);
+    Map<String, dynamic>? data = json.decode(response.body);
 
     if (data != null) {
       data.forEach((orderId, orderData) {
@@ -89,7 +89,7 @@ class Orders with ChangeNotifier {
           id: orderId,
           total: orderData['total'],
           date: DateTime.parse(orderData['date']),
-          products: _getProductsFromOrder(orderData['products'] as List<dynamic>)
+          products: _getProductsFromOrder(orderData['products'] as List<dynamic>?)
         ));
       });
     }

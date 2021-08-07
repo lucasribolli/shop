@@ -11,7 +11,6 @@ import 'package:shop/views/product_detail_screen.dart';
 import 'package:shop/views/product_form_screen.dart';
 import 'package:shop/providers/products.dart';
 import 'package:shop/providers/orders.dart';
-import 'package:shop/views/products_overview_screen.dart';
 import 'package:shop/views/products_screen.dart';
 
 void main() => runApp(MyApp());
@@ -29,7 +28,7 @@ class MyApp extends StatelessWidget {
           update: (_, auth, previousProducts) => new Products(
             auth.token,
             auth.userId,
-            previousProducts.items,
+            previousProducts!.items,
           ),
         ),
         ChangeNotifierProxyProvider<Auth, Orders>(
@@ -37,7 +36,7 @@ class MyApp extends StatelessWidget {
           update: (_, auth, previousOrders) => new Orders(
             auth.token,
             auth.userId,
-            previousOrders.items,
+            previousOrders!.items,
           ),
         ),
         ChangeNotifierProvider(

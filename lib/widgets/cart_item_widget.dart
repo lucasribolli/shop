@@ -27,13 +27,13 @@ class CartItemWidget extends StatelessWidget {
             title: Text('Tem certeza?'),
             content: Text('Quer remover o item do carrinho?'),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.of(ctx).pop(true);
                 },
                 child: Text('Sim'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.of(ctx).pop(false);
                 },
@@ -60,8 +60,8 @@ class CartItemWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(5),
                 child: FittedBox(child: Text('${cartItem.price}')),
               )),
-              title: Text(cartItem.title),
-              subtitle: Text('Total: R\$${cartItem.price * cartItem.quantity}'),
+              title: Text(cartItem.title!),
+              subtitle: Text('Total: R\$${cartItem.price! * cartItem.quantity!}'),
               trailing: Text('${cartItem.quantity}x'),
             ),
           )),

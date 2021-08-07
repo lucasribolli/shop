@@ -5,19 +5,19 @@ import 'package:http/http.dart' as http;
 import 'package:shop/utils/constants.dart';
 
 class Product with ChangeNotifier {
-  final String id;
-  final String title;
-  final String description;
-  final double price;
-  final String imageUrl;
+  final String? id;
+  final String? title;
+  final String? description;
+  final double? price;
+  final String? imageUrl;
   bool isFavorite;
   
   Product({
     this.id,
-    @required this.title,
-    @required this.description,
-    @required this.price,
-    @required this.imageUrl,
+    required this.title,
+    required this.description,
+    required this.price,
+    required this.imageUrl,
     this.isFavorite = false,
   });
 
@@ -26,12 +26,13 @@ class Product with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleFavorite(String token, String userId) async {
+  Future<void> toggleFavorite(String? token, String? userId) async {
     _toggleFavorite();
 
     try {
+      final url = Uri.parse( "${Constants.BASE_URL_USER_FAVORITES}/$userId/$id.json?auth=$token");
       final response = await http.put(
-        "${Constants.BASE_URL_USER_FAVORITES}/$userId/$id.json?auth=$token",
+        url,
         body: json.encode(isFavorite)
       );
 

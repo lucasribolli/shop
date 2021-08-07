@@ -13,23 +13,23 @@ class Auth with ChangeNotifier {
   static const String _signUpSegment = 'signUp';
   static const String _loginSegment = 'signInWithPassword';
 
-  String _token;
-  DateTime _expiryDate;
-  String _userId;
-  Timer _logoutTimer;
+  String? _token;
+  DateTime? _expiryDate;
+  String? _userId;
+  Timer? _logoutTimer;
 
   bool get isAuth {
     return token != null;
   }
 
-  String get userId {
+  String? get userId {
     return isAuth ? _userId : null;
   }
 
-  String get token {
+  String? get token {
     if(_token != null && 
       _expiryDate != null &&
-      _expiryDate.isAfter(DateTime.now())) {
+      _expiryDate!.isAfter(DateTime.now())) {
         return _token;
     } else {
       return null;
@@ -37,9 +37,9 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> _authenticate(
-    String email, String password, String urlSegment) async {
+    String? email, String? password, String urlSegment) async {
     final url = 
-      'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=${ApiKeys.FIREBASE_KEY}';
+      Uri.parse('https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=${ApiKeys.FIREBASE_KEY}');
 
     final response = await http.post(
       url, 
@@ -66,7 +66,7 @@ class Auth with ChangeNotifier {
       Store.saveMap(DataKeys.USER_DATA_KEY, {
         'token': _token,
         'userId': _userId,
-        'expiryDate': _expiryDate.toIso8601String()
+        'expiryDate': _expiryDate!.toIso8601String()
       });
 
       _autoLogout();
@@ -76,11 +76,11 @@ class Auth with ChangeNotifier {
     return Future.value();
   }
 
-  Future<void> signup(String email, String password) async {
+  Future<void> signup(String? email, String? password) async {
     return _authenticate(email, password, _signUpSegment);
   }
 
-  Future<void> login(String email, String password) async {
+  Future<void> login(String? email, String? password) async {
     return _authenticate(email, password, _loginSegment);
   }
 
@@ -113,7 +113,7 @@ class Auth with ChangeNotifier {
     _userId = null;
     _expiryDate = null;
     if(_logoutTimer != null) {
-      _logoutTimer.cancel();
+      _logoutTimer!.cancel();
       _logoutTimer = null;
     }
     await Store.remove(DataKeys.USER_DATA_KEY);
@@ -122,9 +122,9 @@ class Auth with ChangeNotifier {
 
   void _autoLogout() {
     if(_logoutTimer != null) {
-      _logoutTimer.cancel();
+      _logoutTimer!.cancel();
     }
-    final timeToLogout = _expiryDate.difference(DateTime.now()).inSeconds;
+    final timeToLogout = _expiryDate!.difference(DateTime.now()).inSeconds;
     _logoutTimer = Timer(Duration(seconds: timeToLogout), logout);
   }
 }

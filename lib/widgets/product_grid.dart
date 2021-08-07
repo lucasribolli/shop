@@ -10,7 +10,6 @@ class ProductGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(showFavoriteOnly);
     final productsProvider = Provider.of<Products>(context);
     final products = showFavoriteOnly 
       ? productsProvider.favoriteItems
