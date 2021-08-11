@@ -11,7 +11,8 @@ class AuthCard extends StatefulWidget {
   _AuthCardState createState() => _AuthCardState();
 }
 
-class _AuthCardState extends State<AuthCard> {
+class _AuthCardState extends State<AuthCard> 
+ with TickerProviderStateMixin {
   GlobalKey<FormState> _form = GlobalKey();
   bool _isLoading = false;
   AuthMode _authMode = AuthMode.Login;
@@ -21,6 +22,49 @@ class _AuthCardState extends State<AuthCard> {
     'email': '', 
     'password': ''
   };
+
+  late AnimationController _animationController;
+  late Animation<double> _opacityAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(
+        milliseconds: 300
+      ),
+    );
+
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController, 
+        curve: Curves.linear,
+      ),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(0, -1.5),
+      end: Offset(0, 0),
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController, 
+        curve: Curves.linear,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _animationController.dispose();
+    _passwordController.dispose();
+  }
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -79,10 +123,12 @@ class _AuthCardState extends State<AuthCard> {
       setState(() {
         _authMode = AuthMode.Signup;
       });
+      _animationController.forward();
     } else if (_authMode == AuthMode.Signup) {
       setState(() {
         _authMode = AuthMode.Login;
       });
+      _animationController.reverse();
     }
   }
 
@@ -95,81 +141,97 @@ class _AuthCardState extends State<AuthCard> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),
-      child: Container(
-        height: _authMode == AuthMode.Login ? 310 : 390,
-        width: deviceSize.width * 0.75,
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _form,
-          child: Column(
-            children: <Widget>[
-              TextFormField(
-                decoration: InputDecoration(labelText: 'E-mail'),
-                keyboardType: TextInputType.emailAddress,
-                validator: (email) => Validator.validateEmail(email!),
-                onSaved: (value) => _authData['email'] = value,
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Senha'),
-                controller: _passwordController,
-                obscureText: true,
-                keyboardType: TextInputType.text,
-                validator: (password) => Validator.validatePassword(password!),
-                onSaved: (value) => _authData['password'] = value,
-                maxLength: 20,
-              ),
-              if (_authMode == AuthMode.Signup)
+      child: AnimatedSize(
+        vsync: this,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeIn,
+        child: Container(
+          width: deviceSize.width * 0.75,
+          height: _authMode == AuthMode.Login ? 290 : 350,
+          padding: EdgeInsets.all(16.0),
+          child: Form(
+            key: _form,
+            child: Column(
+              children: <Widget>[
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Confirmar senha'),
+                  decoration: InputDecoration(labelText: 'E-mail'),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (email) => Validator.validateEmail(email!),
+                  onSaved: (value) => _authData['email'] = value,
+                ),
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Senha'),
+                  controller: _passwordController,
                   obscureText: true,
                   keyboardType: TextInputType.text,
-                  maxLength: 20,
-                  validator: _authMode == AuthMode.Signup
-                      ? (password) {
-                          if (password != _passwordController.text) {
-                            return 'Senha são diferentes';
-                          }
-                          return null;
-                        }
-                      : null,
+                  validator: (password) => Validator.validatePassword(password!),
+                  onSaved: (value) => _authData['password'] = value,
                 ),
-              SizedBox(height: 20),
-              if (_isLoading)
-                CircularProgressIndicator()
-              else
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
-                    minimumSize: Size(88, 36),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 30.0,
-                      vertical: 8.0,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    textStyle: TextStyle(
-                      color: Theme.of(context).primaryTextTheme.button!.color
+                AnimatedContainer(
+                  constraints: BoxConstraints(
+                    minHeight: _authMode == AuthMode.Signup ? 60 : 0,
+                    maxHeight: _authMode == AuthMode.Signup ? 120 : 0,
+                  ),
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.linear,
+                  child: FadeTransition(
+                    opacity: _opacityAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: TextFormField(
+                        decoration: InputDecoration(labelText: 'Confirmar senha'),
+                        obscureText: true,
+                        keyboardType: TextInputType.text,
+                        validator: _authMode == AuthMode.Signup
+                            ? (password) {
+                                if (password != _passwordController.text) {
+                                  return 'Senha são diferentes';
+                                }
+                                return null;
+                              }
+                            : null,
+                      ),
                     ),
                   ),
+                ),
+                const SizedBox(height: 20),
+                if (_isLoading)
+                  CircularProgressIndicator()
+                else
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).primaryColor,
+                      minimumSize: Size(88, 36),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 30.0,
+                        vertical: 8.0,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      textStyle: TextStyle(
+                        color: Theme.of(context).primaryTextTheme.button!.color
+                      ),
+                    ),
+                    child: Text(
+                      _authMode == AuthMode.Login ? 'Entrar' : 'Registrar',
+                    ),
+                    onPressed: _submit,
+                  ),
+                TextButton(
+                  onPressed: _switchAuthMode,
                   child: Text(
-                    _authMode == AuthMode.Login ? 'Entrar' : 'Registrar',
+                    "Alterar para ${_authMode == AuthMode.Login ? 'Registrar' : 'Login'}",
                   ),
-                  onPressed: _submit,
-                ),
-              TextButton(
-                onPressed: _switchAuthMode,
-                child: Text(
-                  "Alterar para ${_authMode == AuthMode.Login ? 'Registrar' : 'Login'}",
-                ),
-                style: TextButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
-                ),
-              )
-            ],
+                  style: TextButton.styleFrom(
+                    primary: Theme.of(context).primaryColor,
+                  ),
+                )
+              ],
+            ),
           ),
         ),
-      ),
+      )
     );
   }
 }
