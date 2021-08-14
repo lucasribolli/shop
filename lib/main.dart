@@ -4,6 +4,7 @@ import 'package:shop/providers/auth.dart';
 import 'package:shop/providers/cart.dart';
 
 import 'package:shop/utils/app_routes.dart';
+import 'package:shop/utils/custom_transition.dart';
 import 'package:shop/views/auth_home_screen.dart';
 import 'package:shop/views/cart_screen.dart';
 import 'package:shop/views/orders_screen.dart';
@@ -46,10 +47,13 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
           title: 'Minha Loja',
           theme: ThemeData(
-            primarySwatch: Colors.purple,
-            accentColor: Colors.deepOrange,
-            fontFamily: 'Lato',
-          ),
+              primarySwatch: Colors.purple,
+              accentColor: Colors.deepOrange,
+              fontFamily: 'Lato',
+              pageTransitionsTheme: PageTransitionsTheme(builders: {
+                TargetPlatform.android: CustomPageTransitionBuilder(),
+                TargetPlatform.iOS: CustomPageTransitionBuilder(),
+              })),
           routes: {
             AppRoutes.AUTH_HOME: (_) => AuthOrHomeScreen(),
             AppRoutes.PRODUCT_DETAIL: (_) => ProductDetailScreen(),

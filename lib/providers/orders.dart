@@ -5,18 +5,12 @@ import 'package:shop/utils/constants.dart';
 import 'package:shop/providers/cart.dart';
 
 class Order {
-
   final String? id;
   final double? total;
   final List<CartItem>? products;
   final DateTime? date;
 
-  Order({
-    this.id,
-    this.total,
-    this.products,
-    this.date
-  });
+  Order({this.id, this.total, this.products, this.date});
 }
 
 class Orders with ChangeNotifier {
@@ -26,53 +20,49 @@ class Orders with ChangeNotifier {
 
   Orders([this._token, this._userId, this._items = const []]);
 
-  List<Order> get items => [ ..._items ];
+  List<Order> get items => [
+        ..._items
+      ];
 
   int get itemsCount {
     return _items.length;
   }
 
   Future<void> addOrder(Cart cart) async {
-
     final date = DateTime.now();
     final url = Uri.parse("${Constants.BASE_URL_ORDERS}/$_userId.json?auth=$_token");
-    final response = await http.post(
-      url,
-      body: json.encode({
-        'total': cart.totalAmout,
-        'date': date.toIso8601String(),
-        'products': cart.items.values.map((cartItem) => {
-          'id': cartItem.id,
-          'productId': cartItem.productId,
-          'title': cartItem.title,
-          'quantity': cartItem.quantity,
-          'price': cartItem.price,
-        }).toList(),
-      })
-    );
+    final response = await http.post(url,
+        body: json.encode({
+          'total': cart.totalAmout,
+          'date': date.toIso8601String(),
+          'products': cart.items.values
+              .map((cartItem) => {
+                    'id': cartItem.id,
+                    'productId': cartItem.productId,
+                    'title': cartItem.title,
+                    'quantity': cartItem.quantity,
+                    'price': cartItem.price,
+                  })
+              .toList(),
+        }));
 
-    _items.insert(0, Order(
-        id: json.decode(response.body)['name'],
-        total: cart.totalAmout,
-        date: date,
-        products: cart.items.values.toList(),
-      )
-    );
+    _items.insert(
+        0,
+        Order(
+          id: json.decode(response.body)['name'],
+          total: cart.totalAmout,
+          date: date,
+          products: cart.items.values.toList(),
+        ));
     notifyListeners();
   }
 
   List<CartItem> _getProductsFromOrder(List<dynamic>? order) {
-    if(order == null) {
+    if (order == null) {
       return <CartItem>[];
     }
     return order.map((item) {
-      return CartItem(
-        id: item['id'],
-        price: item['price'],
-        productId: item['productId'],
-        quantity: item['quantity'],
-        title: item['title']
-      );
+      return CartItem(id: item['id'], price: item['price'], productId: item['productId'], quantity: item['quantity'], title: item['title']);
     }).toList();
   }
 
@@ -85,12 +75,7 @@ class Orders with ChangeNotifier {
 
     if (data != null) {
       data.forEach((orderId, orderData) {
-        loadedItems.add(Order(
-          id: orderId,
-          total: orderData['total'],
-          date: DateTime.parse(orderData['date']),
-          products: _getProductsFromOrder(orderData['products'] as List<dynamic>?)
-        ));
+        loadedItems.add(Order(id: orderId, total: orderData['total'], date: DateTime.parse(orderData['date']), products: _getProductsFromOrder(orderData['products'] as List<dynamic>?)));
       });
     }
     _items = loadedItems.reversed.toList();
