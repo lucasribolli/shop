@@ -13,28 +13,32 @@ import 'package:shop/views/product_form_screen.dart';
 import 'package:shop/providers/products.dart';
 import 'package:shop/providers/orders.dart';
 import 'package:shop/views/products_screen.dart';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    http.Client client = http.Client();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => new Auth(),
+          create: (_) => new Auth(client),
         ),
         ChangeNotifierProxyProvider<Auth, Products>(
-          create: (_) => Products(),
+          create: (_) => Products(client),
           update: (_, auth, previousProducts) => new Products(
+            client,
             auth.token,
             auth.userId,
             previousProducts!.items,
           ),
         ),
         ChangeNotifierProxyProvider<Auth, Orders>(
-          create: (_) => Orders(),
+          create: (_) => Orders(client),
           update: (_, auth, previousOrders) => new Orders(
+            client,
             auth.token,
             auth.userId,
             previousOrders!.items,

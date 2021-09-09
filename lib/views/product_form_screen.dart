@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/providers/product.dart';
 import 'package:shop/providers/products.dart';
+import 'package:http/http.dart' as http;
 
 class ProductFormScreen extends StatefulWidget {
   @override
@@ -82,6 +83,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         price: _formData['price'] as double?,
         description: _formData['description'] as String?,
         imageUrl: _formData['imageUrl'] as String?,
+        client: http.Client(),
       );
 
       setState(() {

@@ -10,8 +10,9 @@ class Products with ChangeNotifier {
   List<Product> _items;
   String? _token;
   String? _userId;
+  http.Client _client;
 
-  Products([this._token, this._userId, this._items = const []]);
+  Products(this._client, [this._token, this._userId, this._items = const []]);
 
 
   List<Product> get items => [..._items];
@@ -23,9 +24,9 @@ class Products with ChangeNotifier {
   Future<void> loadProducts() async {
     final productsUrl = Uri.parse("${Constants.BASE_URL_PRODUCTS}.json?auth=$_token");
     final favoritesUrl = Uri.parse("${Constants.BASE_URL_USER_FAVORITES}/$_userId.json?auth=$_token");
-    final response = await http.get(productsUrl);
+    final response = await _client.get(productsUrl);
     Map<String, dynamic>? data = json.decode(response.body);
-    final favResponse = await http.get(favoritesUrl);
+    final favResponse = await _client.get(favoritesUrl);
     final favMap = json.decode(favResponse.body);
 
     _items.clear();
@@ -39,6 +40,7 @@ class Products with ChangeNotifier {
           price: productData['price'],
           imageUrl: productData['imageUrl'],
           isFavorite: isFavorite,
+          client: _client
         ));
       });
       notifyListeners();
@@ -63,6 +65,7 @@ class Products with ChangeNotifier {
       description: newProduct.description,
       price: newProduct.price,
       imageUrl: newProduct.imageUrl,
+      client: _client
     ));
     notifyListeners();
   }

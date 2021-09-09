@@ -11,6 +11,7 @@ class Product with ChangeNotifier {
   final double? price;
   final String? imageUrl;
   bool isFavorite;
+  late http.Client client;
   
   Product({
     this.id,
@@ -19,7 +20,9 @@ class Product with ChangeNotifier {
     required this.price,
     required this.imageUrl,
     this.isFavorite = false,
+    required this.client,
   });
+  
 
   void _toggleFavorite() {
     isFavorite = !isFavorite;
@@ -31,7 +34,7 @@ class Product with ChangeNotifier {
 
     try {
       final url = Uri.parse( "${Constants.BASE_URL_USER_FAVORITES}/$userId/$id.json?auth=$token");
-      final response = await http.put(
+      final response = await client.put(
         url,
         body: json.encode(isFavorite)
       );

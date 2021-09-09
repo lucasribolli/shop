@@ -10,13 +10,18 @@ import 'package:shop/utils/data_keys.dart';
 
 
 class Auth with ChangeNotifier {
-  static const String _signUpSegment = 'signUp';
-  static const String _loginSegment = 'signInWithPassword';
+  static const String _SIGN_UP_SEGMENT = 'signUp';
+  static const String _LOGIN_SEGMENT = 'signInWithPassword';
 
   String? _token;
   DateTime? _expiryDate;
   String? _userId;
   Timer? _logoutTimer;
+  late http.Client _client;
+
+  Auth(http.Client client) {
+    this._client = client;
+  }
 
   bool get isAuth {
     return token != null;
@@ -41,7 +46,7 @@ class Auth with ChangeNotifier {
     final url = 
       Uri.parse('https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=${ApiKeys.FIREBASE_KEY}');
 
-    final response = await http.post(
+    final response = await _client.post(
       url, 
       body: json.encode({
         "email": email,
@@ -53,6 +58,7 @@ class Auth with ChangeNotifier {
     final responseBody = json.decode(response.body);
 
     if(responseBody["error"] != null) {
+      Store.remove(DataKeys.USER_DATA_KEY);
       throw AuthException(responseBody['error']['message']);
     } else {
       _token = responseBody["idToken"];
@@ -77,11 +83,11 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> signup(String? email, String? password) async {
-    return _authenticate(email, password, _signUpSegment);
+    return _authenticate(email, password, _SIGN_UP_SEGMENT);
   }
 
   Future<void> login(String? email, String? password) async {
-    return _authenticate(email, password, _loginSegment);
+    return _authenticate(email, password, _LOGIN_SEGMENT);
   }
 
   Future<void> tryAutoLogin() async {
