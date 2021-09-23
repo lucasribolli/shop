@@ -1,5 +1,5 @@
 class AuthException implements Exception {
-  static const Map<String, String> errors = {
+  static const Map<String, String> ERRORS = {
     "EMAIL_NOT_FOUND": "E-mail ou senha inválidos",
     "INVALID_PASSWORD": "E-mail ou senha inválidos",
     "USER_DISABLED": "Usuário desativado",
@@ -14,8 +14,8 @@ class AuthException implements Exception {
 
   @override
   String toString() {
-    if(errors.containsKey(key)) {
-      return errors[key!]!;
+    if(ERRORS.containsKey(key)) {
+      return ERRORS[key!]!;
     } else {
       return 'Ocorreu um erro na autenticação';
     }

@@ -41,7 +41,7 @@ void main() {
         ), 
         isA<Future<void>>()
       );
-      expect(auth.token, isA<String>());
+      expect(auth.token, equals("fakeIdToken"));
       expect(await Store.getMap(DataKeys.USER_DATA_KEY), isA<Map<String, dynamic>>());
     });
 
@@ -61,20 +61,23 @@ void main() {
         http.Response(RESPONSE_SIGN_ERROR, 400));
 
       final Auth auth = Auth(client);
-      expect(
-        auth.signup(
+
+      try {
+        await auth.signup(
           REQUEST_SIGN_ACCOUNT['email'], 
           REQUEST_SIGN_ACCOUNT['password']
-        ), 
-        throwsA(isA<AuthException>())
-      );
-      expect(auth.token, null);
-      expect(await Store.getMap(DataKeys.USER_DATA_KEY), isA<Map<String, dynamic>>());
+        );
+        fail("exception not thrown");
+      } catch (e) {
+        expect(e, isInstanceOf<AuthException>());
+        expect(e.toString(), AuthException.ERRORS["EMAIL_EXISTS"]);
+        expect(auth.token, null);
+      }
     });
 
     test('throws AuthException if password in login is invalid', () async {
       final MockClient client = MockClient();
-
+      
       when(
         client.post(
           Uri.parse(
@@ -87,15 +90,18 @@ void main() {
         http.Response(RESPONSE_LOGIN_WRONG_PASSWORD, 400));
       
       final Auth auth = Auth(client);
-      expect(
-        auth.login(
+
+      try {
+        await auth.login(
           REQUEST_LOGIN_WRONG_PASSWORD['email'], 
           REQUEST_LOGIN_WRONG_PASSWORD['password']
-        ), 
-        throwsA(isA<AuthException>())
-      );
-      expect(auth.token, null);
-      expect(await Store.getMap(DataKeys.USER_DATA_KEY), isA<Map<String, dynamic>>());
+        );
+        fail("exception not thrown");
+      } catch(e) {
+        expect(e, isInstanceOf<AuthException>());
+        expect(e.toString(), AuthException.ERRORS["INVALID_PASSWORD"]);
+        expect(auth.token, null);
+      }
     });
   });
 
