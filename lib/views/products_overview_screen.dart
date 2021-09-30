@@ -13,23 +13,13 @@ enum FilterOptions {
 }
 
 class ProductOverviewScreen extends StatefulWidget {
+  
   @override
   _ProductOverviewScreenState createState() => _ProductOverviewScreenState();
 }
 
 class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   bool _showFavoriteOnly = false;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    Provider.of<Products>(context, listen: false).loadProducts().then((_) {
-      setState(() {
-        _isLoading = false;
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,12 +60,19 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
           )
         ],
       ),
-      body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : ProductGrid(_showFavoriteOnly),
       drawer: AppDrawer(),
+      body: FutureBuilder(
+        future: Provider.of<Products>(context, listen: false).loadProducts(),
+        builder: (context, snapshot) {
+          if(snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            return ProductGrid(_showFavoriteOnly);
+          }
+        },
+      ),
     );
   }
 }

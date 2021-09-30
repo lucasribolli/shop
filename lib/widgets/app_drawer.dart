@@ -26,6 +26,7 @@ class AppDrawer extends StatelessWidget {
           ),
           const Divider(),
           ListTile(
+            key: ValueKey('pedidos_key'),
             leading: Icon(Icons.shop),
             title: Text('Pedidos'),
             onTap: () {
@@ -37,6 +38,7 @@ class AppDrawer extends StatelessWidget {
           ),
           const Divider(),
           ListTile(
+            key: ValueKey('gerenciar_key'),
             leading: Icon(Icons.edit),
             title: Text('Gerenciar Produtos'),
             onTap: () {
@@ -48,6 +50,7 @@ class AppDrawer extends StatelessWidget {
           ),
           const Divider(),
           ListTile(
+            key: ValueKey('sair_key'),
             leading: Icon(Icons.exit_to_app),
             title: Text('Sair'),
             onTap: () async {
